@@ -1,0 +1,150 @@
+.lcc-cookie-banner {  
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #eee;
+    border: 2px solid #bbb;
+    border-bottom: none;
+    padding: 40px 20px 40px 20px;
+    z-index: 999999;
+    display: none;
+    min-height: 120px;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+    transform: translateY(100%);
+    transition: transform 0.4s ease, opacity 0.4s;
+    display: flex;
+    align-items: center;
+}
+
+.lcc-cookie-banner.lcc-show { 
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.lcc-cookie-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+}
+
+.lcc-cookie-text {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+}
+
+.lcc-cookie-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.lcc-cookie-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.lcc-btn-accept,
+.lcc-btn-accept:hover { 
+    background: #4CAF50 !important; 
+    color: white !important;  
+}
+
+.lcc-btn-decline,
+.lcc-btn-decline:hover { 
+    background: #f44336 !important; 
+    color: white !important; 
+}
+
+.lcc-btn-settings,
+.lcc-btn-settings:hover { 
+    background: #2196F3 !important; 
+    color: white !important; 
+}
+
+.lcc-cookie-btn:hover { 
+    color: white !important;
+    border: none !important;
+    opacity: 0.9; 
+}
+
+/* Modal */
+.lcc-cookie-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.lcc-cookie-modal.lcc-show { display: flex; }
+
+.lcc-modal-content {
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.lcc-toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.lcc-toggle-row:last-child { border-bottom: none; }
+
+.lcc-toggle {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    background: #ccc;
+    border-radius: 24px;
+    cursor: pointer;
+}
+
+.lcc-toggle.lcc-active { 
+    background: #4CAF50; 
+}
+
+.lcc-toggle.lcc-disabled { 
+    background: #4CAF50; opacity: 0.5; cursor: not-allowed; 
+}
+
+.lcc-toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.lcc-toggle.lcc-active .lcc-toggle-slider { 
+    transform: translateX(26px); 
+}
+
+.lcc-modal-buttons {
+    text-align: center;
+    margin-top: 20px;
+}

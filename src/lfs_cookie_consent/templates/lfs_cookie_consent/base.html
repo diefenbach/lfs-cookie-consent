@@ -1,0 +1,18 @@
+{% load static %}
+{% load lfs_cookie_consent_tags %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Cookie Banner Test</title>
+    {% gtm_script %}
+</head>
+<body>
+    <h1>Test Cookie Banner</h1>
+    <p>Hier kannst du das Cookie-Banner testen.</p>
+    <a href="#" onclick="window.showCookieSettings(); return false;">Cookie-Einstellungen öffnen</a>
+    {% gtm_noscript %}
+    {% cookie_banner %}
+    {% cookie_modal %}
+</body>
+</html> 
