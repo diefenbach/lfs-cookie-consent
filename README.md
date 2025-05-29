@@ -1,4 +1,6 @@
-![Tests](https://github.com/diefenbach/lfs_cookie_consent/actions/workflows/tests.yml/badge.svg)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue.svg)](https://github.com/diefenbach/lfs-cookie-consent)
+[![Test](https://github.com/diefenbach/git-fleet-manager/actions/workflows/test.yml/badge.svg)](https://github.com/diefenbach/lfs-cookie-consent/actions/workflows/test.yml)
+
 
 # LFS Cookie Consent
 
