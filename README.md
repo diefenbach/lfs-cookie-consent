@@ -28,10 +28,13 @@ it is designed to be used in any Django project.
    ```
 
 ## Usage
-1. Include the template tags in your base template:
+1. Include the template tags and the provided CSS and Javascript in your base template:
    ```django
+   {% load static %}
    {% load lfs_cookie_consent_tags %}
    <head>
+       <link rel="stylesheet" href="{% static 'lfs_cookie_consent/lfs_cookie_consent.css' %}">
+       <script src="{% static 'lfs_cookie_consent/lfs_cookie_consent.js' %}"></script>
        {% gtm_script %}
    </head>
    <body>
@@ -40,6 +43,7 @@ it is designed to be used in any Django project.
        {% cookie_modal %}
    </body>
    ```
+
 2. Add a link to open the modal anywhere:
    ```html
    <a href="#" onclick="window.showCookieSettings(); return false;">Open cookie settings</a>
@@ -82,8 +86,7 @@ This package comes with a simple test view that lets you quickly try out the coo
        # ... your other URLs ...
        path("", test_cookie_banner, name="test_cookie_banner"),
    ]
-   ```
-   > **Note:** This should only be done for testing purposes and should not remain active in production. Make sure you have set your GTM_ID in the settings.
+   ```   > **Note:** This should only be done for testing purposes and should not remain active in production. Make sure you have set your GTM_ID in the settings.
 
 2. Open your project's start page in the browser.
    You should see the cookie banner and modal as intended.
@@ -94,3 +97,4 @@ This package comes with a simple test view that lets you quickly try out the coo
 
 ## License
 MIT License 
+
