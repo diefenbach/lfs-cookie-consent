@@ -24,6 +24,7 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "pytest-mock>=3.10.0",
+    "pytest-django>=4.11.1",
     "black>=23.0.0",
     "ruff>=0.0.200",
     "bandit>=1.7.0",
