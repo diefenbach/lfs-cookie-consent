@@ -1,3 +1,5 @@
+![Tests](https://github.com/diefenbach/lfs_cookie_consent/actions/workflows/tests.yml/badge.svg)
+
 # LFS Cookie Consent
 
 A reusable Django app for GDPR-compliant cookie consent management, featuring integration with Google Tag Manager 
