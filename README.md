@@ -86,7 +86,9 @@ This package comes with a simple test view that lets you quickly try out the coo
        # ... your other URLs ...
        path("", test_cookie_banner, name="test_cookie_banner"),
    ]
-   ```   > **Note:** This should only be done for testing purposes and should not remain active in production. Make sure you have set your GTM_ID in the settings.
+   ```
+   
+   > **Note:** This should only be done for testing purposes and should not remain active in production. Make sure you have set your GTM_ID in the settings.
 
 2. Open your project's start page in the browser.
    You should see the cookie banner and modal as intended.
