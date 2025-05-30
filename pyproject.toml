@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lfs-cookie-consent"
-version = "1.0.0"
+version = "1.0.1"
 description = "Cookie Consent App for LFS/Django"
 authors = [
     { name="Kai Diefenbach", email="kai.diefenbach@iqpp.de" }
