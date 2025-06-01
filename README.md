@@ -1,4 +1,7 @@
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue.svg)](https://github.com/diefenbach/lfs-cookie-consent)
+[![PyPI](https://img.shields.io/pypi/v/lfs-cookie-consent?label=PyPI)](https://pypi.org/project/lfs-cookie-consent/)
+[![Python Versions](https://img.shields.io/badge/python-%3E%3D3.8-blue)](https://www.python.org/downloads/)
+[![Django Versions](https://img.shields.io/badge/django-%3E%3D3.2-blue)](https://www.djangoproject.com/download/)
 [![Test](https://github.com/diefenbach/git-fleet-manager/actions/workflows/test.yml/badge.svg)](https://github.com/diefenbach/lfs-cookie-consent/actions/workflows/test.yml)
 
 
