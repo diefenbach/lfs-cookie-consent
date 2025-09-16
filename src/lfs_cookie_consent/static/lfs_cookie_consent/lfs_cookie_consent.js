@@ -1,6 +1,7 @@
 class DjangoCookieManager {
     #cookieName = 'cookie-consent';
     #consent = null;
+    #toggleListenersAdded = false;
     
     /**
      * Initialize the cookie manager: load consent, show banner or apply consent, and setup events.
@@ -25,8 +26,7 @@ class DjangoCookieManager {
         document.querySelector('#lcc-save-settings')?.addEventListener('click', () => this.#saveSettings());
         document.querySelector('#lcc-close-modal')?.addEventListener('click', () => this.#hideModal());
         
-        // Toggle Switches
-        document.querySelector('#lcc-analytics-toggle')?.addEventListener('click', (e) => this.#toggleSwitch(e.target));
+        // Toggle switches will be set up when modal is shown
     }
     
     /**
@@ -48,9 +48,30 @@ class DjangoCookieManager {
      */
     showModal() {
         const analyticsToggle = document.querySelector('#lcc-analytics-toggle');
+        const advertisingToggle = document.querySelector('#lcc-advertising-toggle');
+        
         if (this.#consent) {
             this.#setToggle(analyticsToggle, this.#consent.analytics);
+            this.#setToggle(advertisingToggle, this.#consent.advertising);
         }
+        
+        // Set up toggle event listeners only once
+        if (!this.#toggleListenersAdded) {
+            // Use event delegation on the modal container
+            const modal = document.querySelector('#lcc-cookie-modal');
+            modal?.addEventListener('click', (e) => {
+                if (e.target.id === 'lcc-analytics-toggle' || e.target.closest('#lcc-analytics-toggle')) {
+                    const toggle = e.target.id === 'lcc-analytics-toggle' ? e.target : e.target.closest('#lcc-analytics-toggle');
+                    this.#toggleSwitch(toggle);
+                } else if (e.target.id === 'lcc-advertising-toggle' || e.target.closest('#lcc-advertising-toggle')) {
+                    const toggle = e.target.id === 'lcc-advertising-toggle' ? e.target : e.target.closest('#lcc-advertising-toggle');
+                    this.#toggleSwitch(toggle);
+                }
+            });
+            
+            this.#toggleListenersAdded = true;
+        }
+        
         document.querySelector('#lcc-cookie-modal')?.classList.add('lcc-show');
     }
     
@@ -86,12 +107,13 @@ class DjangoCookieManager {
     }
         
     /**
-     * Accept all cookies (necessary, analytics), save and apply consent, hide banner.
+     * Accept all cookies (necessary, analytics, advertising), save and apply consent, hide banner.
      */
     #acceptAll() {
         this.#consent = {
             necessary: true,
             analytics: true,
+            advertising: true,
             timestamp: Date.now()
         };
         this.#saveConsent();
@@ -100,17 +122,19 @@ class DjangoCookieManager {
     }
     
     /**
-     * Decline all non-necessary cookies, save and apply consent, hide banner.
+     * Decline all non-necessary cookies (analytics, advertising), save and apply consent, hide banner.
      */
     #declineAll() {
         this.#consent = {
             necessary: true,
             analytics: false,
+            advertising: false,
             timestamp: Date.now()
         };
         this.#saveConsent();
         this.#applyConsent();
         this.#deleteGACookies();
+        this.#deleteAdsCookies();
         this.#hideBanner();
     }
     
@@ -119,11 +143,14 @@ class DjangoCookieManager {
      */
     #saveSettings() {
         const analyticsToggle = document.querySelector('#lcc-analytics-toggle');
+        const advertisingToggle = document.querySelector('#lcc-advertising-toggle');
         const analyticsActive = analyticsToggle?.classList.contains('lcc-active') ?? false;
+        const advertisingActive = advertisingToggle?.classList.contains('lcc-active') ?? false;
         
         this.#consent = {
             necessary: true,
             analytics: analyticsActive,
+            advertising: advertisingActive,
             timestamp: Date.now()
         };
         
@@ -132,6 +159,10 @@ class DjangoCookieManager {
         
         if (!analyticsActive) {
             this.#deleteGACookies();
+        }
+        
+        if (!advertisingActive) {
+            this.#deleteAdsCookies();
         }
         
         this.#hideBanner();
@@ -148,13 +179,16 @@ class DjangoCookieManager {
         if (typeof gtag === 'function') {
             gtag('consent', 'update', {
                 'analytics_storage': this.#consent.analytics ? 'granted' : 'denied',
+                'ad_storage': this.#consent.advertising ? 'granted' : 'denied',
             });
         }
         
         // GTM Events
         window.dataLayer = window.dataLayer || [];
-        const event = this.#consent.analytics ? 'analytics_consent_granted' : 'analytics_consent_denied';
-        window.dataLayer.push({ event });
+        const analyticsEvent = this.#consent.analytics ? 'analytics_consent_granted' : 'analytics_consent_denied';
+        const advertisingEvent = this.#consent.advertising ? 'advertising_consent_granted' : 'advertising_consent_denied';
+        window.dataLayer.push({ event: analyticsEvent });
+        window.dataLayer.push({ event: advertisingEvent });
     }
     
     /**
@@ -200,6 +234,31 @@ class DjangoCookieManager {
         );
         
         gaCookies.forEach(name => {
+            paths.forEach(path => {
+                domains.forEach(d => {
+                    let cookieString = `${name}=; Max-Age=0; path=${path};`;
+                    if (d) cookieString += ` domain=${d};`;
+                    document.cookie = cookieString;
+                });
+            });
+        });
+    }
+    
+    /**
+     * Delete all Google Ads cookies.
+     */
+    #deleteAdsCookies() {
+        const allCookies = document.cookie.split(';').map(c => c.trim().split('=')[0]);
+        const prefixes = ['_gcl_', '_gclid', '_gcl_aw', '_gcl_dc', '_gcl_gb', '_gcl_ha', '_gcl_hb', '_gcl_hc', '_gcl_hd', '_gcl_he', '_gcl_hf', '_gcl_hg', '_gcl_hh', '_gcl_hi', '_gcl_hj', '_gcl_hk', '_gcl_hl', '_gcl_hm', '_gcl_hn', '_gcl_ho', '_gcl_hp', '_gcl_hq', '_gcl_hr', '_gcl_hs', '_gcl_ht', '_gcl_hu', '_gcl_hv', '_gcl_hw', '_gcl_hx', '_gcl_hy', '_gcl_hz', 'IDE', 'test_cookie', 'NID', '1P_JAR', 'CONSENT', 'DV'];
+        const domain = window.location.hostname.replace(/^www\./, '');
+        const paths = ['/', window.location.pathname];
+        const domains = [undefined, domain, '.' + domain];
+        
+        const adsCookies = allCookies.filter(name => 
+            prefixes.some(prefix => name.startsWith(prefix))
+        );
+        
+        adsCookies.forEach(name => {
             paths.forEach(path => {
                 domains.forEach(d => {
                     let cookieString = `${name}=; Max-Age=0; path=${path};`;
