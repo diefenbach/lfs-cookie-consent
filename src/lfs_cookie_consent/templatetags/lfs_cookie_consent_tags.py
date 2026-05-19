@@ -25,3 +25,15 @@ def cookie_banner(gtm_id=None):
 @register.simple_tag
 def cookie_modal():
     return render_to_string("lfs_cookie_consent/cookie_modal.html")
+
+
+@register.simple_tag(takes_context=True)
+def added_to_cart_script(context, event=None):
+    gtm_id = getattr(settings, "GTM_ID", None)
+    return render_to_string(
+        "lfs_cookie_consent/added_to_cart_script.html",
+        {
+            "event": event,
+            "gtm_id": gtm_id,
+        },
+    )
