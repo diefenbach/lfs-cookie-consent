@@ -7,90 +7,91 @@
 [![Test](https://github.com/diefenbach/git-fleet-manager/actions/workflows/test.yml/badge.svg)](https://github.com/diefenbach/lfs-cookie-consent/actions/workflows/test.yml)
 
 
-A reusable Django app for GDPR-compliant cookie consent management, featuring integration with Google Tag Manager (GTM) and Google Consent Mode V2. Originally developed for [Lightning Fast Shop](https://github.com/diefenbach/django-lfs), it is designed for use in any Django project.
+A reusable Django app for GDPR-oriented cookie **consent UI**: banner, detailed modal, and storing the user choice in a first-party cookie. Originally developed for [Lightning Fast Shop](https://github.com/diefenbach/django-lfs), it stays **agnostic of any tag manager** (no GTM/GA code in this package).
 
-> **Note:** LFS Cookie Consent currently supports only Google Analytics cookies. Additional cookie types will be supported in upcoming releases.
+> **Note:** This app does not load third-party scripts. Wire your analytics (e.g. the companion **`lfs-gtm`** package or your own listener) to the browser event described below.
 
 ## Features
-- Cookie banner with options to accept, decline, or customize consent
-- Granular control over necessary and analytics cookies
-- Google Tag Manager (GTM) integration
-- Google Consent Mode V2 support (currently only for `analytics_storage`)
+
+- Cookie banner (accept all, decline all, open settings)
+- Settings modal with toggles for analytics and advertising (in addition to necessary cookies)
+- Consent persisted in a cookie (`cookie-consent`)
+- **`CustomEvent('lfs:consent-changed')`** so other scripts can react (e.g. Google Consent Mode via `lfs_gtm`)
 
 ## Installation
-1. Add the app to your Django project:
-   - Install `lfs_cookie_consent` by running: `pip install lfs-cookie-consent`.
-   - Add `'lfs_cookie_consent'` to your `INSTALLED_APPS` in `settings.py`.
 
-2. Configure your GTM ID in `settings.py`:
-   ```python
-   GTM_ID = "GTM-XXXXXXX"  # Replace with your GTM container ID
+1. Install and add the app:
+
+   ```bash
+   pip install lfs-cookie-consent
    ```
 
-3. Collect static files:
+   ```python
+   INSTALLED_APPS = [
+       # ...
+       "lfs_cookie_consent",
+   ]
+   ```
+
+2. Collect static files:
+
    ```bash
    python manage.py collectstatic
    ```
 
 ## Usage
-1. Include the template tags and the provided CSS and JavaScript in your base template:
-   ```django
-   {% load static %}
-   {% load lfs_cookie_consent_tags %}
-   <head>
-       <link rel="stylesheet" href="{% static 'lfs_cookie_consent/lfs_cookie_consent.css' %}">
-       <script src="{% static 'lfs_cookie_consent/lfs_cookie_consent.js' %}"></script>
-       {% gtm_script %}
-   </head>
-   <body>
-       {% gtm_noscript %}
-       {% cookie_banner %}
-       {% cookie_modal %}
-   </body>
-   ```
 
-2. Add a link to open the modal anywhere:
-   ```html
-   <a href="#" onclick="window.showCookieSettings(); return false;">Open cookie settings</a>
-   ```
+In your base template:
 
-## How it works
-- On the first visit, a cookie banner is displayed.
-- Users can accept all, decline all, or customize their preferences (currently only analytics cookies).
-- Consent is stored in a cookie and applied via Google Consent Mode V2 (`analytics_storage`).
-- GTM and Google Analytics tags will only fire if consent is granted.
+```django
+{% load static %}
+{% load lfs_cookie_consent_tags %}
+<head>
+    <link rel="stylesheet" href="{% static 'lfs_cookie_consent/lfs_cookie_consent.css' %}">
+</head>
+<body>
+    {% cookie_banner %}
+    {% cookie_modal %}
+    <script defer src="{% static 'lfs_cookie_consent/lfs_cookie_consent.js' %}"></script>
+</body>
+```
 
-## Google Tag Manager Setup
-1. Create a GTM container and use the ID in your Django settings.
-2. Add a Google Analytics 4 tag in GTM.
-3. Add a `Page View` trigger to your tag
-4. Don't forget to publish your changes
-5. Consent Mode is automatically handled by this app (no extra GTM configuration needed).
-6. Test with Tag Assistant or GTM Preview to ensure tags fire only after consent.
+Link to reopen settings (footer, etc.):
 
-## Test View and Temporary URL Inclusion
-This package includes a simple test view that lets you quickly try out the cookie banner and modal. The view renders a sample page with all relevant components.
+```html
+<a href="#" onclick="window.showCookieSettings(); return false;">Cookie settings</a>
+```
 
-**How to use the test view:**
+## Browser event contract
 
-1. Temporarily add the test view URL to your project:
-   Open your main `urls.py` (e.g., in your main project or test project) and add:
-   ```python
-   from lfs_cookie_consent.views import test_cookie_banner
-   from django.urls import path
+Whenever consent is applied (including on first paint if a consent cookie already exists), the script dispatches:
 
-   urlpatterns = [
-       # ... your other URLs ...
-       path("", test_cookie_banner, name="test_cookie_banner"),
-   ]
-   ```
-   
-2. Open your project's start page in the browser.
-   You should see the cookie banner and modal as intended.
+```text
+lfs:consent-changed
+```
 
-3. Open your browser's developer tools, go to the cookies section, and observe how cookies are set or deleted based on your consent choices.
+`event.detail` is a plain object:
 
-4. Remove the temporary URL once you have finished testing the functionality.
+| Field         | Type    | Description                    |
+|---------------|---------|--------------------------------|
+| `necessary`   | boolean | Always `true` in current UI    |
+| `analytics`   | boolean | User choice for analytics      |
+| `advertising` | boolean | User choice for advertising    |
+| `timestamp`   | number  | Milliseconds (`Date.now()`)    |
+
+Integrations (e.g. **lfs-gtm**) should listen on `document` and must be loaded **after** `lfs_cookie_consent.js` if they need to observe the event fired during `DOMContentLoaded` init.
+
+## Migrating from 1.x
+
+Version **2.0** removes GTM template tags and JavaScript from this package.
+
+- Add **`lfs_gtm`** (or your own integration) if you use Google Tag Manager.
+- Replace `{% gtm_script %}`, `{% gtm_noscript %}`, and `{% added_to_cart_script %}` with the equivalents from `lfs_gtm_tags`; see the **lfs-gtm** README for load order (`gtm_script` in `<head>`, then consent assets, then `lfs_gtm_consent.js` with `defer` after consent JS).
+
+## Test view
+
+This package includes a minimal test page (`lfs_cookie_consent.views.test_cookie_banner` → template `lfs_cookie_consent/base.html`). Wire it in your `urls.py` temporarily to try the banner locally, then remove the URL.
 
 ## License
-MIT License 
+
+MIT License

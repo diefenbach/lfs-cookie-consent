@@ -1,11 +1,7 @@
-import pytest
-from django.test import Client
+from django.template.loader import render_to_string
 
 
-@pytest.mark.django_db
 def test_base_template_renders_banner_and_modal():
-    client = Client()
-    response = client.get("/")
-    assert response.status_code == 200
-    assert "lcc-cookie-banner" in response.content.decode()
-    assert "lcc-cookie-modal" in response.content.decode()
+    html = render_to_string("lfs_cookie_consent/base.html", {})
+    assert "lcc-cookie-banner" in html
+    assert "lcc-cookie-modal" in html

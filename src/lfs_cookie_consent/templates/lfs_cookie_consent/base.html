@@ -5,14 +5,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Cookie Banner Test</title>
-    {% gtm_script %}
+    <link rel="stylesheet" href="{% static 'lfs_cookie_consent/lfs_cookie_consent.css' %}">
 </head>
 <body>
     <h1>Test Cookie Banner</h1>
     <p>Hier kannst du das Cookie-Banner testen.</p>
     <a href="#" onclick="window.showCookieSettings(); return false;">Cookie-Einstellungen öffnen</a>
-    {% gtm_noscript %}
     {% cookie_banner %}
     {% cookie_modal %}
+    <script src="{% static 'lfs_cookie_consent/lfs_cookie_consent.js' %}"></script>
 </body>
-</html> 
+</html>
